@@ -13,7 +13,7 @@ class KituraTranslationTests: XCTestCase {
 
         // Note that the po files in this directory are from Apache OpenOffice
         let path = URL(fileURLWithPath: #file + "/../Translations").standardizedFileURL.path
-        TranslationBank.settings = TranslationBank.TranslationBankSettings(lang: "fr", poDir: path)
+        TranslationBank.settings = TranslationBankSettings(lang: "fr", poDir: path)
 
         let formatsTrans = "Formats".t()
         XCTAssertTrue(formatsTrans == "Mise en forme", "Translation of \"Formats\" without context failed (got \"\(formatsTrans)\").")

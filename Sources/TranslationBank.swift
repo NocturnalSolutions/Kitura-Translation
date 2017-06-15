@@ -1,19 +1,26 @@
 import Foundation
 import LoggerAPI
 
-public class TranslationBank {
-    enum StoreMode {
+public struct TranslationBankSettings {
+    public enum StoreMode {
         case AlwaysFromFile, Memory
     }
 
+    public var lang: String
+    let poDir: String
+    let storeMode: StoreMode
+
+    public init(lang: String, poDir: String, storeMode: StoreMode = .Memory) {
+        self.lang = lang
+        self.poDir = poDir
+        self.storeMode = storeMode
+    }
+}
+
+public class TranslationBank {
+
     enum TranslationBankError: Error {
         case NoSettings
-    }
-
-    public struct TranslationBankSettings {
-        let storeMode: StoreMode = .Memory
-        var lang: String
-        let poDir: String
     }
 
     public static var settings: TranslationBankSettings?
@@ -162,13 +169,13 @@ public class TranslationBank {
                 Log.error("Could not find msgstr in section \(idx) of PO file \(atPath.path); skipping.")
                 continue
             }
-//            guard msgctxt != nil else {
-//                Log.error("Could not find msgctxt in section \(idx) of PO file \(atPath.path); skipping.")
-//                continue
-//            }
-
+            //            guard msgctxt != nil else {
+            //                Log.error("Could not find msgctxt in section \(idx) of PO file \(atPath.path); skipping.")
+            //                continue
+            //            }
+            
             setT(string: msgid!, context: msgctxt, translation: msgstr!)
-
+            
         }
     }
 }
