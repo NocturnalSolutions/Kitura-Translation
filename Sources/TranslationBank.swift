@@ -1,7 +1,7 @@
 import Foundation
 import LoggerAPI
 
-class TranslationBank {
+public class TranslationBank {
     enum StoreMode {
         case AlwaysFromFile, Memory
     }
@@ -10,13 +10,13 @@ class TranslationBank {
         case NoSettings
     }
 
-    struct TranslationBankSettings {
+    public struct TranslationBankSettings {
         let storeMode: StoreMode = .Memory
         var lang: String
         let poDir: String
     }
 
-    static var settings: TranslationBankSettings?
+    public static var settings: TranslationBankSettings?
 
     static var store: [String : [String : String]?] = [:]
 
