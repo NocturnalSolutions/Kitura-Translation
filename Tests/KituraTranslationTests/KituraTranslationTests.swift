@@ -1,16 +1,11 @@
 import XCTest
 import LoggerAPI
-import HeliumLogger
 
 @testable import KituraTranslation
 
 class KituraTranslationTests: XCTestCase {
 
     func testPoImport() {
-        // Trick to make sure logged messages are still visible while tests run
-        let se = StandardError()
-        HeliumStreamLogger.use(outputStream: se)
-
         // Note that the po files in this directory are from Apache OpenOffice
         let path = URL(fileURLWithPath: #file + "/../Translations").standardizedFileURL.path
         TranslationBank.settings = TranslationBankSettings(lang: "fr", poDir: path)
@@ -32,14 +27,4 @@ class KituraTranslationTests: XCTestCase {
     static var allTests = [
         ("testPoImport", testPoImport),
     ]
-}
-
-// Thank you to https://deepswift.com/core/standard-io/ <3
-struct StandardError: TextOutputStream {
-    func write(_ text: String) {
-        guard let data = text.data(using: String.Encoding.utf8) else {
-            return
-        }
-        FileHandle.standardError.write(data)
-    }
 }
