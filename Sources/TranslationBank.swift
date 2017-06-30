@@ -32,8 +32,13 @@ public class TranslationBank {
             Log.error("Set settings before attempting translation!")
             throw TranslationBankError.NoSettings
         }
-        let key = buildKey(string: string, context: context)
         let lang = settings!.lang
+
+        if lang == "x-pseudo" {
+            return pseudolocalize(string)
+        }
+
+        let key = buildKey(string: string, context: context)
 
         if store[lang] == nil {
             TranslationBank.importTranslations()
@@ -177,5 +182,73 @@ public class TranslationBank {
             setT(string: msgid!, context: msgctxt, translation: msgstr!)
             
         }
+    }
+
+    static public func pseudolocalize(_ string: String) -> String {
+        // Substitution table from https://github.com/eirikRude/pseudolocalizer/blob/master/pseudo.js
+        // (MIT licensed)
+        let charTable: [String: String] = [
+            "A": "Å",
+            "B": "Ƀ",
+            "C": "Č",
+            "D": "Ɖ",
+            "E": "Ǝ",
+            "F": "Ƒ",
+            "G": "Ǥ",
+            "H": "Ӊ",
+            "I": "Ì",
+            "J": "Ĵ",
+            "K": "Ӄ",
+            "L": "Ĺ",
+            "M": "Ӎ",
+            "N": "Ń",
+            "O": "ϴ",
+            "P": "Ƥ",
+            "Q": "Ϙ",
+            "R": "Я",
+            "S": "Ƨ",
+            "T": "Ť",
+            "U": "Ų",
+            "V": "Ʋ",
+            "W": "Ŵ",
+            "X": "Ӿ",
+            "Y": "Ỵ",
+            "Z": "Ƶ",
+            "a": "ą",
+            "b": "Ƃ",
+            "c": "č",
+            "d": "ď",
+            "e": "ë",
+            "f": "ḟ",
+            "g": "ḡ",
+            "h": "ḧ",
+            "i": "ἳ",
+            "j": "ĵ",
+            "k": "ķ",
+            "l": "ľ",
+            "m": "ṁ",
+            "n": "ņ",
+            "o": "ѻ",
+            "p": "ҏ",
+            "q": "ɖ",
+            "r": "ȑ",
+            "s": "ᶊ",
+            "t": "ț",
+            "u": "ữ",
+            "v": "ѷ",
+            "w": "ŵ",
+            "x": "ӿ",
+            "y": "ŷ",
+            "z": "ȥ"
+        ]
+
+        var translated = string
+
+        charTable.forEach({key, value in
+            translated = translated.replacingOccurrences(of: key, with: value)
+        })
+
+        return "[!!! " + translated + " !!!]"
+
     }
 }

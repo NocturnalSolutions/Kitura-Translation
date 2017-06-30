@@ -24,6 +24,9 @@ class KituraTranslationTests: XCTestCase {
         XCTAssertTrue(jaFormatsTrans == "属性", "Translation of \"Formats\" to Japanese failed (got \"\(jaFormatsTrans)\").")
         let jaCalWPlaceholders = "%PRODUCTNAME Calendar".t(["%PRODUCTNAME": "バナナ"])
         XCTAssertTrue(jaCalWPlaceholders == "バナナ カレンダー", "Simple placeholders failed (got \"\(jaCalWPlaceholders)\").")
+        TranslationBank.settings!.lang = "x-pseudo"
+        let psTrans = "Hello!".t()
+        XCTAssertEqual(psTrans, "[!!! Ӊëľľѻ! !!!]", "Pseudolocalization failed (got \"\(psTrans)\".")
     }
 
     static var allTests = [
