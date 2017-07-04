@@ -1,5 +1,6 @@
 import Foundation
 import LoggerAPI
+import Dispatch
 
 public struct TranslationBankSettings {
     public enum StoreMode {
@@ -26,6 +27,7 @@ public class TranslationBank {
     public static var settings: TranslationBankSettings?
 
     static var store: [String : [String : String]?] = [:]
+    static var poLoadLock = DispatchSemaphore(value: 1)
 
     public class func getT(string: String, context: String?) throws -> String? {
         guard settings != nil else {
@@ -40,9 +42,14 @@ public class TranslationBank {
 
         let key = buildKey(string: string, context: context)
 
+        if poLoadLock.wait(timeout: .now() + .seconds(5)) == .timedOut {
+            Log.warning("Timed out attempting to load translations for \(lang).")
+            return string
+        }
         if store[lang] == nil {
             TranslationBank.importTranslations()
         }
+        poLoadLock.signal()
 
         if let byLang = store[lang] {
             if byLang![key] != nil {
@@ -108,6 +115,7 @@ public class TranslationBank {
             Log.error("Couldn't read PO file \(atPath.absoluteString); skipping.")
             return
         }
+        Log.info("Parsing PO file \(atPath.absoluteString).")
         let poString = String(data: fileContentData, encoding: .utf8)
         // Sanitize line breaks
         let poStringClean = poString?.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
