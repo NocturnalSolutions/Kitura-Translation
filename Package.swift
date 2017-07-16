@@ -5,6 +5,6 @@ import PackageDescription
 let package = Package(
     name: "KituraTranslation",
     dependencies: [
-        .Package(url: "https://github.com/IBM-Swift/LoggerAPI", majorVersion: 1)
+        .Package(url: "https://github.com/IBM-Swift/LoggerAPI.git", majorVersion: 1)
     ]
 )
