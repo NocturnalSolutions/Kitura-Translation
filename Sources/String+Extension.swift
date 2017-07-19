@@ -13,10 +13,10 @@ extension String {
 
     public func t(_ context: String? = nil) -> String {
         do {
-            let translated = try TranslationBank.getT(string: self, context: context)
+            let translated = try Translation.getT(string: self, context: context)
             return translated ?? self
         }
-        catch TranslationBank.TranslationBankError.NoSettings {
+        catch Translation.TranslationError.NoSettings {
             return self
         }
         catch {
