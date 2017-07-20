@@ -24,7 +24,7 @@ public class Translation {
         case NoSettings
     }
 
-    public static var settings: TranslationSettings?
+    public static var settings: TranslationSettings!
 
     static var store: [String : [String : String]?] = [:]
     static var poLoadLock = DispatchSemaphore(value: 1)
@@ -34,7 +34,7 @@ public class Translation {
             Log.error("Set settings before attempting translation!")
             throw TranslationError.NoSettings
         }
-        let lang = settings!.lang
+        let lang = settings.lang
 
         if lang == "x-pseudo" {
             return pseudolocalize(string)
@@ -54,7 +54,7 @@ public class Translation {
         if let byLang = store[lang] {
             if byLang![key] != nil {
                 // Hit found.
-                if settings!.storeMode != .Memory {
+                if settings.storeMode != .Memory {
                     let hit = byLang![key]!
                     store[lang] = [:]
                     return hit
@@ -69,7 +69,7 @@ public class Translation {
 
     class func setT(string: String, context: String?, translation: String) {
         let key = Translation.buildKey(string: string, context: context)
-        let lang = Translation.settings!.lang
+        let lang = Translation.settings.lang
         if Translation.store[lang] == nil {
             Translation.store[lang] = [key: translation]
         }
@@ -94,8 +94,8 @@ public class Translation {
     }
 
     class func importTranslations() {
-        let lang = Translation.settings!.lang
-        let langDirPath = Translation.settings!.poDir + "/" + lang
+        let lang = Translation.settings.lang
+        let langDirPath = Translation.settings.poDir + "/" + lang
         var trueObjCBool: ObjCBool = true
         guard FileManager.default.fileExists(atPath: langDirPath, isDirectory: &trueObjCBool) else {
             Log.error("PO language directory \(langDirPath) is not a directory or not readable.")
