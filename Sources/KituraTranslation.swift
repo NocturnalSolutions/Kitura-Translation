@@ -2,13 +2,25 @@ import Foundation
 import LoggerAPI
 import Dispatch
 
+/// A struct to store settings for Translation.
 public struct TranslationSettings {
+
+    /// How are translations stored?
+    /// - Todo: A Redis method?
     public enum StoreMode {
-        case AlwaysFromFile, Memory
+        /// Always load translations from PO files. Good for testing PO files
+        /// while editing them.
+        case AlwaysFromFile
+        /// Load translations from PO files, then store them in memory.
+        case Memory
     }
 
+    /// The language code.
     public var lang: String
+    /// The directory PO files are stored in.
     let poDir: String
+    /// The translation storage mode.
+    /// - SeeAlso: StoreMode
     let storeMode: StoreMode
 
     public init(lang: String, poDir: String, storeMode: StoreMode = .Memory) {
@@ -18,17 +30,30 @@ public struct TranslationSettings {
     }
 }
 
+/// The primary Kitura Translation static class.
 public class Translation {
 
+    /// Enumeration of possible errors.
     enum TranslationError: Error {
+        /// Trying to use the class before settings have been set.
         case NoSettings
     }
 
+    /// Stores the current settings
     public static var settings: TranslationSettings!
 
+    /// An array of the translations by language codes.
     static var store: [String : [String : String]?] = [:]
+    /// A semaphore to make sure we're not loading from more than one PO file
+    /// at once.
     static var poLoadLock = DispatchSemaphore(value: 1)
 
+    /// Get a translation.
+    ///
+    /// - Parameter string: The string to get a translation for.
+    /// - Parameter context: The context string, if any, to get a translation
+    ///   for.
+    /// - Throws: TranslationError
     public class func getT(string: String, context: String?) throws -> String? {
         guard settings != nil else {
             Log.error("Set settings before attempting translation!")
@@ -67,6 +92,11 @@ public class Translation {
         return string
     }
 
+    /// Store a translation.
+    ///
+    /// - Parameter string: The string being translated.
+    /// - Parameter context: The context string, if any.
+    /// - Parameter translation: The translated string.
     class func setT(string: String, context: String?, translation: String) {
         let key = Translation.buildKey(string: string, context: context)
         let lang = Translation.settings.lang
@@ -79,6 +109,13 @@ public class Translation {
         }
     }
 
+    /// Build the key translations are stored by.
+    ///
+    /// Keys are built from the string being translated concatenated with the
+    /// context string, and max out at 256 characters long.
+    ///
+    /// - Parameter string: The string being translated.
+    /// - Parameter context: The context string, if any.
     class func buildKey(string: String, context: String?) -> String {
         let mutableContext = context ?? ""
         var key = string + ":" + mutableContext
@@ -93,6 +130,7 @@ public class Translation {
 
     }
 
+    /// Import translations from PO files for the current language.
     class func importTranslations() {
         let lang = Translation.settings.lang
         let langDirPath = Translation.settings.poDir + "/" + lang
@@ -110,6 +148,9 @@ public class Translation {
         }
     }
 
+    /// Parse a PO file.
+    ///
+    /// - Parameter atPath: The URL of the PO file to import translations from.
     class func parsePo(atPath: URL) {
         guard let fileContentData = try? Data(contentsOf: atPath) else {
             Log.error("Couldn't read PO file \(atPath.absoluteString); skipping.")
@@ -192,6 +233,10 @@ public class Translation {
         }
     }
 
+    /// Pseudolocalize a string, for testing user interfaces and such.
+    ///
+    /// See https://en.wikipedia.org/wiki/Pseudolocalization for more
+    /// information about pseudolocalization.
     static public func pseudolocalize(_ string: String) -> String {
         // Substitution table from https://github.com/eirikRude/pseudolocalizer/blob/master/pseudo.js
         // (MIT licensed)
